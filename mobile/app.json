@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Trivial Dev",
+    "slug": "trivial-dev",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.trivialdev.interview",
+      "usesCleartextTraffic": true,
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Trivial Dev usa el micrófono para transcribir tu respuesta.",
+          "speechRecognitionPermission": "Trivial Dev transcribe lo que dices para usarlo como respuesta."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
