@@ -66,6 +66,14 @@ function renderInterview(questions: Question[]) {
       start: () => undefined,
       stop: () => undefined,
     },
+    ownQuestions: {
+      async load() {
+        return []
+      },
+      async save() {
+        return undefined
+      },
+    },
   }
 
   return render(

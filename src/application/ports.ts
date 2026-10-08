@@ -38,8 +38,14 @@ export interface SpeechTranscriber {
   stop(): void
 }
 
+export interface OwnQuestionStore {
+  load(): Promise<Question[]>
+  save(questions: Question[]): Promise<void>
+}
+
 export interface Services {
   questions: QuestionSource
   evaluator: AnswerEvaluator
   speech: SpeechTranscriber
+  ownQuestions: OwnQuestionStore
 }

@@ -43,7 +43,8 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -299,6 +300,18 @@ h2,
   background: var(--bg-raise);
   border-color: #1a6580;
   cursor: not-allowed;
+}
+
+.setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.setup-link {
+  color: var(--yellow);
+  font-weight: 700;
 }
 
 .text-button,
@@ -609,6 +622,144 @@ h2,
 
 .sheet .hint {
   color: var(--ink-soft);
+}
+
+.library {
+  display: grid;
+  gap: 14px;
+}
+
+.library h1,
+.library h2 {
+  margin: 0;
+}
+
+.library h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.library h2 {
+  margin-top: 8px;
+  font-size: 1.35rem;
+}
+
+.library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.library details {
+  color: var(--ink-soft);
+}
+
+.library pre {
+  overflow: auto;
+  margin: 8px 0 0;
+  padding: 12px;
+  color: var(--paper);
+  background: var(--navy);
+  border-radius: 12px;
+  font-size: 0.82rem;
+}
+
+.own-form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field span,
+.choice-options legend {
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea,
+.choice-option input[type='text'] {
+  width: 100%;
+  padding: 12px 14px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.choice-options {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.choice-option input[type='radio'] {
+  accent-color: var(--pink);
+}
+
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.ghost {
+  padding: 10px 16px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.own-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.own-item {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.own-prompt,
+.own-answer {
+  margin: 0;
+}
+
+.own-answer {
+  color: var(--ink-soft);
+}
+
+.sheet .primary:disabled {
+  color: var(--ink-soft);
+  background: var(--paper-2);
+  border-color: var(--line);
 }
 
 :focus-visible {

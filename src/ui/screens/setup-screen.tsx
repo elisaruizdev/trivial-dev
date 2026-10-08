@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { levelBrief, levels, type Level } from '../../domain/level.ts'
 import { topics } from '../../domain/topic.ts'
 import { useInterview } from '../use-interview.ts'
@@ -95,14 +95,19 @@ export function SetupScreen() {
         </fieldset>
         {loading ? <p className="hint">Son 30 preguntas. Puede tardar un momento.</p> : null}
         {error ? <p className="form-error">{error}</p> : null}
-        <button
-          className="primary"
-          type="submit"
-          disabled={!ready || loading}
-          aria-describedby={ready ? undefined : 'start-hint'}
-        >
-          {loading ? 'Preparando preguntas…' : 'Empezar entrevista'}
-        </button>
+        <div className="setup-actions">
+          <button
+            className="primary"
+            type="submit"
+            disabled={!ready || loading}
+            aria-describedby={ready ? undefined : 'start-hint'}
+          >
+            {loading ? 'Preparando preguntas…' : 'Empezar entrevista'}
+          </button>
+          <Link className="setup-link" to="/mis-preguntas">
+            Mis preguntas
+          </Link>
+        </div>
       </form>
     </main>
   )

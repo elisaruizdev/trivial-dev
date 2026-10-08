@@ -4,16 +4,19 @@ import { levelBrief } from '../../src/domain/level.ts'
 import { responseLabel } from '../../src/domain/question.ts'
 import { verdictLabel } from '../../src/ui/labels.ts'
 import { useInterview } from '../../src/ui/use-interview.ts'
+import { useScreenSpace } from './screen-space.ts'
+import { SourceLink } from './source-link.tsx'
 import { colors } from './theme.ts'
 
 export function ResultScreen() {
   const { state, reset } = useInterview()
+  const space = useScreenSpace()
   if (state.status !== 'summary') return null
   const { interview } = state
   const summary = summarize(interview.records)
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.screen} contentContainerStyle={[styles.content, space]}>
       <Text style={styles.eyebrow}>
         {interview.topic.label} · {levelBrief[interview.level].label}
       </Text>
@@ -33,6 +36,7 @@ export function ResultScreen() {
           <Text style={styles.body}>Tu respuesta. {responseLabel(record.question, record.response)}</Text>
           <Text style={styles.body}>{record.grade.comment}</Text>
           <Text style={styles.body}>{record.question.explanation}</Text>
+          <SourceLink url={record.question.sourceUrl} />
         </View>
       ))}
       <Pressable style={styles.primary} onPress={reset}>
@@ -44,7 +48,7 @@ export function ResultScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { padding: 20, paddingBottom: 48, gap: 12 },
+  content: { paddingHorizontal: 20, gap: 12 },
   eyebrow: { color: colors.navy, letterSpacing: 1, fontSize: 12, fontWeight: '700', textTransform: 'uppercase' },
   score: { color: colors.ink, fontSize: 64, fontWeight: '600' },
   scoreTotal: { color: colors.muted, fontSize: 28 },

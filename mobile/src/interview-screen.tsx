@@ -6,10 +6,13 @@ import { verdictLabel } from '../../src/ui/labels.ts'
 import { useInterview } from '../../src/ui/use-interview.ts'
 import { CodeBox } from './code-box.tsx'
 import { Dictation } from './dictation.tsx'
+import { useScreenSpace } from './screen-space.ts'
+import { SourceLink } from './source-link.tsx'
 import { colors } from './theme.ts'
 
 export function InterviewScreen() {
   const { state, submit, next, reset } = useInterview()
+  const space = useScreenSpace()
   if (state.status !== 'question' && state.status !== 'feedback') return null
 
   const { interview } = state
@@ -20,7 +23,7 @@ export function InterviewScreen() {
   const position = interview.index + 1
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.screen} contentContainerStyle={[styles.content, space]}>
       <View style={styles.bar}>
         <View>
           <Text style={styles.eyebrow}>
@@ -47,6 +50,7 @@ export function InterviewScreen() {
           <Text style={styles.eyebrow}>{verdictLabel[feedback.grade.verdict]}</Text>
           <Text style={styles.body}>{feedback.grade.comment}</Text>
           <Text style={styles.body}>{question.explanation}</Text>
+          <SourceLink url={question.sourceUrl} />
           <Pressable style={styles.primary} onPress={next}>
             <Text style={styles.primaryText}>{position === total ? 'Ver resultado' : 'Siguiente pregunta'}</Text>
           </Pressable>
@@ -114,7 +118,7 @@ function QuestionBody({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { padding: 20, paddingBottom: 48, gap: 12 },
+  content: { paddingHorizontal: 20, gap: 12 },
   bar: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   eyebrow: { color: colors.navy, letterSpacing: 1, fontSize: 12, fontWeight: '700', textTransform: 'uppercase' },
   progress: { color: colors.muted, marginTop: 4 },

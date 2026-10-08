@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { InterviewScreen } from './screens/interview-screen.tsx'
+import { OwnQuestionsScreen } from './screens/own-questions-screen.tsx'
 import { ResultScreen } from './screens/result-screen.tsx'
 import { SetupScreen } from './screens/setup-screen.tsx'
 
@@ -8,6 +9,7 @@ export function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<SetupScreen />} />
+        <Route path="/mis-preguntas" element={<OwnQuestionsScreen />} />
         <Route path="/entrevista" element={<InterviewScreen />} />
         <Route path="/resultado" element={<ResultScreen />} />
         <Route path="*" element={<Navigate to="/" replace />} />
