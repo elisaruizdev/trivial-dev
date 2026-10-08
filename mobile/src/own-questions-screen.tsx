@@ -16,6 +16,7 @@ import {
 import { kindLabel } from '../../src/ui/labels.ts'
 import { ownOptionSlots, useOwnQuestionDraft } from '../../src/ui/use-own-question-draft.ts'
 import { useServices } from '../../src/ui/use-services.ts'
+import { Credit } from './credit.tsx'
 import { useScreenSpace } from './screen-space.ts'
 import { colors } from './theme.ts'
 
@@ -117,7 +118,8 @@ export function OwnQuestionsScreen({ onClose }: { onClose: () => void }) {
       </Text>
       <Text style={styles.lead}>
         Escribe una o sube un JSON. Se quedan en este teléfono. Si el tema y el nivel coinciden, entra en la ronda
-        mezclada con las demás. La respuesta que marques es la que puntúa.
+        mezclada con las demás. La respuesta que marques es la que puntúa. La fuente, si la escribes, se consulta al
+        responder.
       </Text>
       <View style={styles.actions}>
         <Pressable style={styles.ghost} onPress={() => void onUpload()} accessibilityRole="button">
@@ -237,6 +239,17 @@ export function OwnQuestionsScreen({ onClose }: { onClose: () => void }) {
         </View>
       )}
 
+      <Text style={styles.label}>Fuente</Text>
+      <TextInput
+        style={styles.input}
+        value={draft.sourceUrl}
+        onChangeText={draft.setSourceUrl}
+        placeholder="https://… (opcional)"
+        placeholderTextColor={colors.muted}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="url"
+      />
       <Text style={styles.label}>Por qué es esa la respuesta</Text>
       <TextInput
         style={styles.input}
@@ -292,6 +305,7 @@ export function OwnQuestionsScreen({ onClose }: { onClose: () => void }) {
                   ? question.options.find((option) => option.id === question.answerId)?.text
                   : question.modelAnswer}
               </Text>
+              {question.sourceUrl ? <Text style={styles.note}>{question.sourceUrl}</Text> : null}
               <Pressable onPress={() => void onRemove(question.id)} accessibilityRole="button">
                 <Text style={styles.link}>Quitar</Text>
               </Pressable>
@@ -299,6 +313,7 @@ export function OwnQuestionsScreen({ onClose }: { onClose: () => void }) {
           )
         })
       )}
+      <Credit />
     </ScrollView>
   )
 }

@@ -14,6 +14,7 @@ export interface OwnQuestionDraft {
   modelAnswer: string
   explanation: string
   snippet: { language: string; source: string } | null
+  sourceUrl?: string
 }
 
 export interface OwnQuestionImport {
@@ -34,7 +35,8 @@ export const ownQuestionExample = `{
         { "id": "b", "text": "div" }
       ],
       "answerId": "a",
-      "explanation": "main es el contenido principal de la página."
+      "explanation": "main es el contenido principal de la página.",
+      "sourceUrl": "https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/main"
     },
     {
       "topicId": "javascript",
@@ -108,6 +110,20 @@ function readSnippet(value: unknown): { snippet: CodeSnippet | null } | { error:
   return { snippet: { language: language.ok.toLowerCase(), source: source.ok } }
 }
 
+function readSourceUrl(value: unknown): { sourceUrl: string | null } | { error: string } {
+  if (value == null) return { sourceUrl: null }
+  const text = clip(value, 500)
+  if ('error' in text && text.error === 'missing') return { sourceUrl: null }
+  if ('error' in text) return { error: 'La fuente es demasiado larga.' }
+  try {
+    const url = new URL(text.ok)
+    if (url.protocol !== 'https:') return { error: 'La fuente tiene que ser un enlace https.' }
+  } catch {
+    return { error: 'La fuente tiene que ser un enlace https.' }
+  }
+  return { sourceUrl: text.ok }
+}
+
 function assemble(item: unknown, id: string): Question | string {
   if (!isRecord(item)) return 'Cada pregunta tiene que ser un objeto.'
   const topicId = clip(item.topicId, 40)
@@ -128,6 +144,8 @@ function assemble(item: unknown, id: string): Question | string {
   if ('error' in explanation) return 'La explicación es demasiado larga.'
   const snippet = readSnippet(item.snippet)
   if ('error' in snippet) return snippet.error
+  const sourceUrl = readSourceUrl(item.sourceUrl)
+  if ('error' in sourceUrl) return sourceUrl.error
 
   if (kind.ok === 'choice') {
     const options = readOptions(item.options)
@@ -148,7 +166,7 @@ function assemble(item: unknown, id: string): Question | string {
       modelAnswer: correct?.text ?? '',
       explanation: explanation.ok,
       snippet: snippet.snippet,
-      sourceUrl: null,
+      sourceUrl: sourceUrl.sourceUrl,
     }
   }
 
@@ -166,7 +184,7 @@ function assemble(item: unknown, id: string): Question | string {
     modelAnswer: modelAnswer.ok,
     explanation: explanation.ok,
     snippet: snippet.snippet,
-    sourceUrl: null,
+    sourceUrl: sourceUrl.sourceUrl,
   }
 }
 
@@ -312,6 +330,7 @@ export function exportOwnQuestions(questions: readonly Question[]): string {
         modelAnswer: question.modelAnswer,
         explanation: question.explanation,
         snippet: question.snippet,
+        sourceUrl: question.sourceUrl,
       })),
     },
     null,

@@ -61,10 +61,16 @@ describe('OwnQuestionsScreen', () => {
     await user.paste('div')
     await user.click(screen.getByLabelText('Por qué es esa la respuesta'))
     await user.paste('main es el contenido principal.')
+    await user.click(screen.getByLabelText('Fuente'))
+    await user.paste('https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/main')
     await user.click(screen.getByRole('button', { name: 'Guardar pregunta' }))
 
     expect(await screen.findByText('Guardada. Entrará en las rondas de ese tema y nivel.')).toBeInTheDocument()
     expect(screen.getByText('¿Qué elemento marca el contenido principal?')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Consultar en developer.mozilla.org' })).toHaveAttribute(
+      'href',
+      'https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/main',
+    )
     expect(store.questions).toHaveLength(1)
 
     await user.click(screen.getByRole('button', { name: 'Quitar «¿Qué elemento marca el contenido principal?»' }))

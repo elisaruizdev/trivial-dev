@@ -18,6 +18,7 @@ export function useOwnQuestionDraft() {
   const [explanation, setExplanation] = useState('')
   const [language, setLanguage] = useState('')
   const [source, setSource] = useState('')
+  const [sourceUrl, setSourceUrl] = useState('')
 
   function setOption(index: number, text: string) {
     setOptions((current) => current.map((item, itemIndex) => (itemIndex === index ? text : item)))
@@ -34,6 +35,7 @@ export function useOwnQuestionDraft() {
       modelAnswer,
       explanation,
       snippet: language.trim() || source.trim() ? { language, source } : null,
+      sourceUrl,
     }
   }
 
@@ -45,6 +47,7 @@ export function useOwnQuestionDraft() {
     setExplanation('')
     setLanguage('')
     setSource('')
+    setSourceUrl('')
   }
 
   return {
@@ -68,6 +71,8 @@ export function useOwnQuestionDraft() {
     setLanguage,
     source,
     setSource,
+    sourceUrl,
+    setSourceUrl,
     toDraft,
     clearText,
   }

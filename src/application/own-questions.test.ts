@@ -56,6 +56,12 @@ describe('preguntas propias', () => {
     expect(question.options.map((option) => option.text)).toEqual(['main', 'div'])
   })
 
+  it('guarda un enlace https y rechaza el que no lo es', () => {
+    const url = 'https://developer.mozilla.org/es/docs/Web/HTML/Reference/Elements/main'
+    expect(buildOwnQuestion({ ...choice, sourceUrl: url }, 'own-html-1').sourceUrl).toBe(url)
+    expect(() => buildOwnQuestion({ ...choice, sourceUrl: 'http://example.com' })).toThrow(InterviewError)
+  })
+
   it('exige la respuesta en una pregunta escrita', () => {
     expect(() =>
       buildOwnQuestion({

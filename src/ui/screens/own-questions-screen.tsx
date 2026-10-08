@@ -13,6 +13,7 @@ import {
   removeOwnQuestion,
 } from '../../application/own-questions.ts'
 import { kindLabel } from '../labels.ts'
+import { SourceLink } from '../source-link.tsx'
 import { ownOptionSlots, useOwnQuestionDraft } from '../use-own-question-draft.ts'
 import { useServices } from '../use-services.ts'
 
@@ -104,7 +105,8 @@ export function OwnQuestionsScreen() {
         <h1>Mis preguntas</h1>
         <p className="hint">
           Escribe una o sube un JSON. Se quedan en este navegador. Si el tema y el nivel coinciden, entra en la ronda
-          mezclada con las demás. La respuesta que marques es la que puntúa.
+          mezclada con las demás. La respuesta que marques es la que puntúa. La fuente, si la escribes, se consulta al
+          responder.
         </p>
         <div className="library-actions">
           <label className="ghost file-button">
@@ -201,6 +203,15 @@ export function OwnQuestionsScreen() {
             </label>
           )}
           <label className="field">
+            <span>Fuente</span>
+            <input
+              type="url"
+              value={draft.sourceUrl}
+              placeholder="https://…"
+              onChange={(event) => draft.setSourceUrl(event.target.value)}
+            />
+          </label>
+          <label className="field">
             <span>Por qué es esa la respuesta</span>
             <textarea
               value={draft.explanation}
@@ -249,6 +260,7 @@ export function OwnQuestionsScreen() {
                       ? question.options.find((option) => option.id === question.answerId)?.text
                       : question.modelAnswer}
                   </p>
+                  <SourceLink url={question.sourceUrl} />
                   <button
                     type="button"
                     className="text-button"

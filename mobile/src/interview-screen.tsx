@@ -5,6 +5,7 @@ import type { Question } from '../../src/domain/question.ts'
 import { verdictLabel } from '../../src/ui/labels.ts'
 import { useInterview } from '../../src/ui/use-interview.ts'
 import { CodeBox } from './code-box.tsx'
+import { Credit } from './credit.tsx'
 import { Dictation } from './dictation.tsx'
 import { useScreenSpace } from './screen-space.ts'
 import { SourceLink } from './source-link.tsx'
@@ -56,6 +57,7 @@ export function InterviewScreen() {
           </Pressable>
         </View>
       ) : null}
+      <Credit tone="ink" />
     </ScrollView>
   )
 }

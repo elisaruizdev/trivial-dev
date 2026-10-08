@@ -4,6 +4,7 @@ import { levelBrief, levels, type Level } from '../../src/domain/level.ts'
 import { topics } from '../../src/domain/topic.ts'
 import { useInterview } from '../../src/ui/use-interview.ts'
 import { apiOrigin } from './api-origin.ts'
+import { Credit } from './credit.tsx'
 import { useScreenSpace } from './screen-space.ts'
 import { colors } from './theme.ts'
 
@@ -79,6 +80,7 @@ export function SetupScreen({ onOpenLibrary }: { onOpenLibrary: () => void }) {
       <Pressable style={[styles.primary, !ready || loading ? styles.primaryOff : null]} disabled={!ready || loading} onPress={() => void onStart()}>
         <Text style={styles.primaryText}>{loading ? 'Preparando preguntas…' : 'Empezar entrevista'}</Text>
       </Pressable>
+      <Credit />
     </ScrollView>
   )
 }

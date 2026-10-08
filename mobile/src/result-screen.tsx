@@ -4,6 +4,7 @@ import { levelBrief } from '../../src/domain/level.ts'
 import { responseLabel } from '../../src/domain/question.ts'
 import { verdictLabel } from '../../src/ui/labels.ts'
 import { useInterview } from '../../src/ui/use-interview.ts'
+import { Credit } from './credit.tsx'
 import { useScreenSpace } from './screen-space.ts'
 import { SourceLink } from './source-link.tsx'
 import { colors } from './theme.ts'
@@ -42,6 +43,7 @@ export function ResultScreen() {
       <Pressable style={styles.primary} onPress={reset}>
         <Text style={styles.primaryText}>Otra entrevista</Text>
       </Pressable>
+      <Credit tone="ink" />
     </ScrollView>
   )
 }
