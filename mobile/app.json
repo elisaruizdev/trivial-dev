@@ -32,7 +32,14 @@
         }
       ],
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#003049",
+          "defaultChannel": "practice"
+        }
+      ]
     ]
   }
 }

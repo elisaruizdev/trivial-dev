@@ -319,18 +319,18 @@ export function OwnQuestionsScreen({ onClose }: { onClose: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: 'transparent' },
   content: { paddingHorizontal: 24, gap: 10 },
-  title: { color: '#fff', fontSize: 32, fontWeight: '800' },
+  title: { color: colors.paper, fontSize: 32, fontWeight: '800' },
   lead: { color: colors.paper, fontSize: 16, lineHeight: 22 },
   link: { color: colors.yellow, fontWeight: '700' },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  ghost: { borderWidth: 1, borderColor: colors.paper, borderRadius: 999, paddingVertical: 10, paddingHorizontal: 14 },
-  ghostText: { color: colors.paper, fontWeight: '700' },
+  ghost: { borderWidth: 1, borderColor: colors.yellow, borderRadius: 999, paddingVertical: 10, paddingHorizontal: 14 },
+  ghostText: { color: colors.yellow, fontWeight: '700' },
   off: { opacity: 0.45 },
   example: { color: colors.paper, backgroundColor: colors.raise, padding: 12, borderRadius: 12, fontSize: 12 },
   notice: { backgroundColor: colors.partialBg, color: colors.ink, padding: 10, borderRadius: 10 },
-  error: { color: colors.pinkOnBg },
+  error: { color: colors.bad },
   heading: { marginTop: 12, color: colors.paper, fontSize: 20, fontWeight: '800' },
   label: { marginTop: 8, color: colors.paper, fontWeight: '700' },
   note: { color: colors.textSoft },

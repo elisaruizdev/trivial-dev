@@ -60,12 +60,12 @@ const styles = StyleSheet.create({
   body: { color: colors.ink, lineHeight: 22 },
   primary: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.yellow,
+    backgroundColor: colors.navy,
     borderRadius: 999,
     borderWidth: 2,
     borderColor: colors.navy,
     paddingVertical: 14,
     paddingHorizontal: 22,
   },
-  primaryText: { color: colors.navy, fontWeight: '700' },
+  primaryText: { color: colors.yellow, fontWeight: '700' },
 })

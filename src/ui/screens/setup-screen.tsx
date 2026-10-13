@@ -3,11 +3,20 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { levelBrief, levels, type Level } from '../../domain/level.ts'
 import { topics } from '../../domain/topic.ts'
+import { browserOnboardingPreference } from '../../infrastructure/browser-onboarding-preference-store.ts'
 import { useInterview } from '../use-interview.ts'
+import { useNarrowViewport } from '../use-narrow-viewport.ts'
+import { useOnboardingGate } from '../use-onboarding-gate.ts'
+import { OnboardingFlow } from './onboarding-flow.tsx'
 
 export function SetupScreen() {
   const { state, start } = useInterview()
   const navigate = useNavigate()
+  const narrow = useNarrowViewport()
+  const { loading: onboardingLoading, showIntro, finishIntro } = useOnboardingGate(
+    browserOnboardingPreference,
+    narrow,
+  )
   const [topicId, setTopicId] = useState<string | null>(null)
   const [level, setLevel] = useState<Level | null>(null)
   const ready = topicId !== null && level !== null
@@ -22,22 +31,36 @@ export function SetupScreen() {
     if (started) navigate('/entrevista')
   }
 
+  if (narrow && onboardingLoading) {
+    return null
+  }
+
+  if (narrow && showIntro) {
+    return <OnboardingFlow onFinish={(hideNextTime) => void finishIntro(hideNextTime)} />
+  }
+
   return (
     <main className="setup">
-      <div className="setup-copy">
-        <p className="eyebrow">Prepara tu entrevista técnica</p>
-        <h1 className="mark-title">
-          <span className="mark-line">
-            <span className="mark-word mark-pink">Trivial</span>{' '}
-            <span className="mark-word mark-yellow">para</span>
-          </span>
-          <span className="mark-line">
-            <span className="mark-word mark-mint">desarrolladores</span>
-          </span>
-          <span className="mark-line">
-            <span className="mark-word mark-blue">inquietos</span>
-          </span>
-        </h1>
+      <div className={narrow ? 'setup-copy setup-copy--compact' : 'setup-copy'}>
+        {!narrow ? (
+          <>
+            <p className="eyebrow">Prepara tu entrevista técnica</p>
+            <h1 className="mark-title">
+              <span className="mark-line">
+                <span className="mark-word mark-pink">Trivial</span>{' '}
+                <span className="mark-word mark-yellow">para</span>
+              </span>
+              <span className="mark-line">
+                <span className="mark-word mark-mint">desarrolladores</span>
+              </span>
+              <span className="mark-line">
+                <span className="mark-word mark-blue">inquietos</span>
+              </span>
+            </h1>
+          </>
+        ) : (
+          <p className="eyebrow">Prepara tu entrevista técnica</p>
+        )}
         <p className="setup-lead">
           Elige el tema y el nivel. A partir de ahí, las preguntas llegan como en una entrevista:
           algunas se marcan, otras se escriben y, en senior, alguna se dice en voz alta.
@@ -106,6 +129,9 @@ export function SetupScreen() {
           </button>
           <Link className="setup-link" to="/mis-preguntas">
             Mis preguntas
+          </Link>
+          <Link className="setup-link" to="/escribir">
+            Escribir código
           </Link>
         </div>
       </form>

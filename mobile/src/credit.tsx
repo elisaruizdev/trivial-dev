@@ -4,12 +4,12 @@ import { colors } from './theme.ts'
 const linkedin = 'https://www.linkedin.com/in/elisaruizortega/'
 
 export function Credit({ tone = 'light' }: { tone?: 'light' | 'ink' }) {
-  const muted = tone === 'ink' ? colors.muted : colors.textSoft
+  const color = tone === 'ink' ? colors.navy : colors.textSoft
   const name = tone === 'ink' ? colors.navy : colors.yellow
 
   return (
     <View style={styles.wrap}>
-      <Text style={[styles.line, { color: muted }]}>
+      <Text style={[styles.line, { color }]}>
         Creado por{' '}
         <Text
           style={[styles.name, { color: name }]}

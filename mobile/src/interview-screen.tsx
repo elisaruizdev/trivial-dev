@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   feedback: { gap: 8, padding: 16, borderRadius: 14, backgroundColor: colors.card },
   primary: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.yellow,
+    backgroundColor: colors.navy,
     borderRadius: 999,
     borderWidth: 2,
     borderColor: colors.navy,
@@ -145,5 +145,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
   },
   primaryOff: { opacity: 0.45 },
-  primaryText: { color: colors.navy, fontWeight: '700' },
+  primaryText: { color: colors.yellow, fontWeight: '700' },
 })

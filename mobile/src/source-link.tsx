@@ -21,6 +21,6 @@ const styles = StyleSheet.create({
     color: colors.navy,
     fontWeight: '700',
     textDecorationLine: 'underline',
-    textDecorationColor: colors.blue,
+    textDecorationColor: colors.mint,
   },
 })

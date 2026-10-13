@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { CodePracticeScreen } from './screens/code-practice-screen.tsx'
 import { InterviewScreen } from './screens/interview-screen.tsx'
 import { OwnQuestionsScreen } from './screens/own-questions-screen.tsx'
 import { ResultScreen } from './screens/result-screen.tsx'
@@ -13,6 +14,7 @@ export function App() {
         <Route element={<Shell />}>
           <Route path="/" element={<SetupScreen />} />
           <Route path="/mis-preguntas" element={<OwnQuestionsScreen />} />
+          <Route path="/escribir" element={<CodePracticeScreen />} />
           <Route path="/entrevista" element={<InterviewScreen />} />
           <Route path="/resultado" element={<ResultScreen />} />
           <Route path="*" element={<Navigate to="/" replace />} />
