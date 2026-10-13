@@ -320,7 +320,7 @@ export function OwnQuestionsScreen({ onClose }: { onClose: () => void }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: 'transparent' },
-  content: { paddingHorizontal: 24, gap: 10 },
+  content: { flexGrow: 1, paddingHorizontal: 24, gap: 10 },
   title: { color: colors.paper, fontSize: 32, fontWeight: '800' },
   lead: { color: colors.paper, fontSize: 16, lineHeight: 22 },
   link: { color: colors.yellow, fontWeight: '700' },

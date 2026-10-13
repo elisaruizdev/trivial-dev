@@ -120,7 +120,7 @@ function QuestionBody({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, gap: 12 },
+  content: { flexGrow: 1, paddingHorizontal: 20, gap: 12 },
   bar: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   eyebrow: { color: colors.navy, letterSpacing: 1, fontSize: 12, fontWeight: '700', textTransform: 'uppercase' },
   progress: { color: colors.muted, marginTop: 4 },
@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
   options: { gap: 8 },
   option: { padding: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.card },
   optionOn: { borderColor: colors.ink },
-  optionGood: { backgroundColor: colors.goodBg, borderColor: colors.good },
-  optionBad: { backgroundColor: colors.badBg, borderColor: colors.bad },
+  optionGood: { backgroundColor: colors.rightBg, borderColor: colors.right, borderWidth: 2 },
+  optionBad: { backgroundColor: colors.badBg, borderColor: colors.bad, borderWidth: 2 },
   body: { color: colors.ink, lineHeight: 22 },
   feedback: { gap: 8, padding: 16, borderRadius: 14, backgroundColor: colors.card },
   primary: {

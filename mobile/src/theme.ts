@@ -17,6 +17,8 @@ export const colors = {
   goodBg: '#FCBF49',
   bad: '#D62828',
   badBg: '#F6D4D0',
+  right: '#2E7D32',
+  rightBg: '#C8E6C9',
   partialBg: '#F8D7A8',
   code: '#003049',
   codeText: '#EAE2B7',

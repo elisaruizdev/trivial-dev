@@ -25,7 +25,7 @@ export function Credit({ tone = 'light' }: { tone?: 'light' | 'ink' }) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginTop: 28, alignItems: 'center' },
+  wrap: { marginTop: 'auto', paddingTop: 28, alignItems: 'center' },
   line: { fontSize: 13, textAlign: 'center' },
   name: { fontWeight: '700', textDecorationLine: 'underline' },
 })

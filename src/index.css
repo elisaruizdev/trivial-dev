@@ -19,6 +19,8 @@
   --partial-bg: #f8d7a8;
   --bad: #d62828;
   --bad-bg: #f6d4d0;
+  --right: #2e7d32;
+  --right-bg: #c8e6c9;
   --text-on-bg: #eae2b7;
   --text-soft: #e4d7a4;
   --pink-on-bg: #d62828;
@@ -376,6 +378,7 @@ h2,
 }
 
 .site-footer {
+  margin-top: auto;
   padding: 8px 20px calc(18px + env(safe-area-inset-bottom, 0px));
   text-align: center;
   color: var(--text-soft);
@@ -487,13 +490,13 @@ h2,
 }
 
 .option.is-correct {
-  background: var(--good-bg);
-  border-color: var(--good);
+  background: var(--right-bg);
+  border: 2px solid var(--right);
 }
 
 .option.is-wrong {
   background: var(--bad-bg);
-  border-color: var(--bad);
+  border: 2px solid var(--bad);
 }
 
 .option input {
@@ -603,6 +606,28 @@ h2,
 
 .review p {
   margin: 0;
+}
+
+.verdict-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 10px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.verdict-badge.is-correct {
+  background: var(--right);
+}
+
+.verdict-badge.is-incorrect {
+  background: var(--bad);
+}
+
+.verdict-badge.is-partial {
+  background: var(--mint);
 }
 
 .review-label {

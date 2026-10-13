@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native'
+import { BackHandler, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { applyAutoClose } from '../../src/application/auto-close.ts'
 import {
+  noteRun,
+  noteSolutionViewed,
+  readCodingProgress,
+  type CodingMark,
+  type CodingProgress,
+} from '../../src/application/coding-progress.ts'
+import {
+  practicePassed,
   practiceProgram,
   practiceRunnerHtml,
   type PracticeLine,
@@ -18,8 +19,16 @@ import type { CodingExercise } from '../../src/domain/coding-exercise.ts'
 import { levelBrief, levels, type Level } from '../../src/domain/level.ts'
 import { codingExercises, exercisesForLevel } from '../../src/infrastructure/coding/catalog.ts'
 import { Credit } from './credit.tsx'
+import { JsonFile } from './json-file.ts'
 import { useScreenSpace } from './screen-space.ts'
 import { colors } from './theme.ts'
+
+const progressFile = new JsonFile('coding-progress.json', readCodingProgress)
+
+const markCopy: Record<CodingMark, string> = {
+  passed: 'Hecho',
+  review: 'Repasar',
+}
 
 interface RunPayload {
   id: number
@@ -35,6 +44,10 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
   const runIdRef = useRef<number | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const selectionRef = useRef({ start: 0, end: 0 })
+  const scrollRef = useRef<ScrollView>(null)
+  const scrollYRef = useRef(0)
+  const listYRef = useRef(0)
+  const runExerciseRef = useRef<string | null>(null)
   const [runnerKey, setRunnerKey] = useState(0)
   const [level, setLevel] = useState<Level>('junior')
   const [query, setQuery] = useState('')
@@ -44,6 +57,7 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
   const [lines, setLines] = useState<PracticeLine[]>([])
   const [running, setRunning] = useState(false)
   const [solved, setSolved] = useState(false)
+  const [progress, setProgress] = useState<CodingProgress>({})
 
   const list = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -62,7 +76,38 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
     }
   }, [])
 
+  useEffect(() => {
+    void progressFile.load().then(setProgress)
+  }, [])
+
+  function mark(change: (current: CodingProgress) => CodingProgress) {
+    setProgress((current) => {
+      const next = change(current)
+      if (next !== current) void progressFile.save(next)
+      return next
+    })
+  }
+
+  function backToList() {
+    setSelectedId(null)
+    setRunning(false)
+    runIdRef.current = null
+    const y = listYRef.current
+    requestAnimationFrame(() => scrollRef.current?.scrollTo({ y, animated: false }))
+  }
+
+  // The Android back button returns to the list from an exercise, and home from the list.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (selectedId) backToList()
+      else onClose()
+      return true
+    })
+    return () => sub.remove()
+  })
+
   function openExercise(next: CodingExercise) {
+    listYRef.current = scrollYRef.current
     setSelectedId(next.id)
     setCode(next.starter)
     setLines([])
@@ -92,6 +137,7 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
     if (!exercise || running) return
     const id = Date.now()
     runIdRef.current = id
+    runExerciseRef.current = exercise.id
     setRunning(true)
     setLines([])
     const script = `runPractice(${JSON.stringify(practiceProgram(exercise, code))}, ${id}); true;`
@@ -104,7 +150,12 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
       queuedRef.current = null
       readyRef.current = false
       setRunning(false)
-      setLines([{ level: 'error', text: 'La ejecución ha tardado demasiado y se ha cortado.' }])
+      setLines([
+        {
+          level: 'error',
+          text: 'La ejecución ha tardado demasiado y se ha cortado.',
+        },
+      ])
       setRunnerKey((key) => key + 1)
     }, 1500)
   }
@@ -121,13 +172,23 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
     runIdRef.current = null
     setRunning(false)
     setLines(payload.lines)
+    const ranId = runExerciseRef.current
+    if (ranId) mark((current) => noteRun(current, ranId, practicePassed(payload.lines)))
   }
 
   return (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={[styles.content, space]} keyboardShouldPersistTaps="handled">
-        <Pressable onPress={onClose} accessibilityRole="button">
-          <Text style={styles.back}>Volver</Text>
+      <ScrollView
+        ref={scrollRef}
+        onScroll={(event) => {
+          scrollYRef.current = event.nativeEvent.contentOffset.y
+        }}
+        scrollEventThrottle={64}
+        contentContainerStyle={[styles.content, space]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Pressable onPress={exercise ? backToList : onClose} accessibilityRole="button">
+          <Text style={styles.back}>{exercise ? 'Volver a la lista' : 'Volver'}</Text>
         </Pressable>
         <Text style={styles.title} accessibilityRole="header">
           Escribir código
@@ -173,9 +234,6 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
         </Text>
         {exercise ? (
           <View style={styles.work}>
-            <Pressable onPress={() => setSelectedId(null)} accessibilityRole="button">
-              <Text style={styles.back}>Volver a la lista</Text>
-            </Pressable>
             <Text style={styles.exerciseTitle}>{exercise.title}</Text>
             <Text style={styles.prompt}>{exercise.prompt}</Text>
             <Text style={styles.meta}>Terminal</Text>
@@ -199,7 +257,14 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
               <Pressable style={[styles.primary, running ? styles.off : null]} disabled={running} onPress={onRun}>
                 <Text style={styles.primaryText}>{running ? 'Ejecutando…' : 'Ejecutar'}</Text>
               </Pressable>
-              <Pressable style={styles.ghost} onPress={() => setSolved((open) => !open)} accessibilityRole="button">
+              <Pressable
+                style={styles.ghost}
+                onPress={() => {
+                  if (!solved) mark((current) => noteSolutionViewed(current, exercise.id))
+                  setSolved((open) => !open)
+                }}
+                accessibilityRole="button"
+              >
                 <Text style={styles.ghostText}>Resuelve</Text>
               </Pressable>
             </View>
@@ -234,12 +299,23 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
           </View>
         ) : (
           <View style={styles.list}>
-            {list.map((item) => (
-              <Pressable key={item.id} style={styles.item} onPress={() => openExercise(item)}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
-                <Text style={styles.itemName}>{item.names.length > 0 ? item.names.join(' · ') : 'script'}</Text>
-              </Pressable>
-            ))}
+            {list.map((item) => {
+              const state = progress[item.id]
+              return (
+                <Pressable key={item.id} style={styles.item} onPress={() => openExercise(item)}>
+                  <View style={styles.itemHead}>
+                    <Text style={[styles.itemTitle, styles.itemTitleText]}>{item.title}</Text>
+                    {state ? (
+                      <Text style={[styles.badge, state === 'passed' ? styles.badgePassed : styles.badgeReview]}>
+                        {state === 'passed' ? '✓ ' : '↻ '}
+                        {markCopy[state]}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <Text style={styles.itemName}>{item.names.length > 0 ? item.names.join(' · ') : 'script'}</Text>
+                </Pressable>
+              )
+            })}
             {list.length === 0 ? <Text style={styles.lead}>Ningún enunciado coincide.</Text> : null}
           </View>
         )}
@@ -265,12 +341,19 @@ export function CodePracticeScreen({ onClose }: { onClose: () => void }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingHorizontal: 20, gap: 10 },
+  content: { flexGrow: 1, paddingHorizontal: 20, gap: 10 },
   back: { color: colors.blue, fontWeight: '700' },
   title: { color: colors.ink, fontSize: 32, fontWeight: '700' },
   lead: { color: colors.muted, lineHeight: 22 },
   tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  tab: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.card },
+  tab: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.card,
+  },
   tabOn: { backgroundColor: colors.navy, borderColor: colors.navy },
   tabText: { color: colors.ink, fontWeight: '700' },
   tabTextOn: { color: colors.paper },
@@ -283,10 +366,34 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     borderRadius: 12,
   },
-  meta: { color: colors.muted, fontSize: 12, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
+  meta: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
   list: { gap: 8 },
-  item: { padding: 10, borderRadius: 12, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.line },
+  item: {
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  itemHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   itemTitle: { color: colors.ink, fontWeight: '700' },
+  itemTitleText: { flex: 1 },
+  badge: {
+    fontSize: 12,
+    fontWeight: '700',
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  badgePassed: { color: colors.paper, backgroundColor: colors.navy },
+  badgeReview: { color: colors.paper, backgroundColor: colors.bad },
   itemName: { color: colors.muted, marginTop: 2, fontSize: 12 },
   work: { gap: 10 },
   exerciseTitle: { color: colors.ink, fontSize: 22, fontWeight: '700' },
@@ -302,15 +409,42 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  primary: { backgroundColor: colors.navy, borderRadius: 999, borderWidth: 2, borderColor: colors.navy, paddingVertical: 12, paddingHorizontal: 18 },
+  primary: {
+    backgroundColor: colors.navy,
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: colors.navy,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
   primaryText: { color: colors.yellow, fontWeight: '700' },
   off: { opacity: 0.45 },
-  ghost: { borderRadius: 999, borderWidth: 1, borderColor: colors.ink, paddingVertical: 12, paddingHorizontal: 18 },
+  ghost: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.ink,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
   ghostText: { color: colors.ink, fontWeight: '700' },
-  console: { gap: 4, padding: 12, backgroundColor: colors.navy, borderRadius: 12 },
-  consoleLine: { color: colors.codeText, fontFamily: 'monospace', fontSize: 13 },
+  console: {
+    gap: 4,
+    padding: 12,
+    backgroundColor: colors.navy,
+    borderRadius: 12,
+  },
+  consoleLine: {
+    color: colors.codeText,
+    fontFamily: 'monospace',
+    fontSize: 13,
+  },
   consoleError: { color: colors.pinkOnBg },
-  solution: { gap: 8, padding: 12, backgroundColor: colors.card, borderRadius: 14 },
+  solution: {
+    gap: 8,
+    padding: 12,
+    backgroundColor: colors.card,
+    borderRadius: 14,
+  },
   strong: { fontWeight: '700' },
   lang: { marginTop: 6, color: colors.ink, fontWeight: '700' },
   source: {

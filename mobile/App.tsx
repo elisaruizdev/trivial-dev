@@ -6,6 +6,7 @@ import { ServicesProvider } from '../src/ui/services-context.tsx'
 import { InterviewProvider } from '../src/ui/interview-context.tsx'
 import { useInterview } from '../src/ui/use-interview.ts'
 import { createServices } from './src/create-services.ts'
+import { AboutScreen } from './src/about-screen.tsx'
 import { CodePracticeScreen } from './src/code-practice-screen.tsx'
 import { InterviewScreen } from './src/interview-screen.tsx'
 import { OwnQuestionsScreen } from './src/own-questions-screen.tsx'
@@ -34,7 +35,7 @@ export default function App() {
 
 function Root() {
   const { state } = useInterview()
-  const [panel, setPanel] = useState<'home' | 'library' | 'code'>('home')
+  const [panel, setPanel] = useState<'home' | 'library' | 'code' | 'about'>('home')
   const { loading: onboardingLoading, showIntro, finishIntro } = useOnboardingGate(fileOnboardingPreference, true)
   const paper = state.status === 'question' || state.status === 'feedback' || state.status === 'summary'
   const atHome = !paper
@@ -46,11 +47,16 @@ function Root() {
       {state.status === 'summary' ? <ResultScreen /> : null}
       {atHome && panel === 'library' ? <OwnQuestionsScreen onClose={() => setPanel('home')} /> : null}
       {atHome && panel === 'code' ? <CodePracticeScreen onClose={() => setPanel('home')} /> : null}
+      {atHome && panel === 'about' ? <AboutScreen onClose={() => setPanel('home')} /> : null}
       {atHome && panel === 'home' && !onboardingLoading && showIntro ? (
         <OnboardingFlow onFinish={(hideNextTime) => void finishIntro(hideNextTime)} />
       ) : null}
       {atHome && panel === 'home' && !onboardingLoading && !showIntro ? (
-        <SetupScreen onOpenLibrary={() => setPanel('library')} onOpenCode={() => setPanel('code')} />
+        <SetupScreen
+          onOpenLibrary={() => setPanel('library')}
+          onOpenCode={() => setPanel('code')}
+          onOpenAbout={() => setPanel('about')}
+        />
       ) : null}
     </View>
   )
@@ -63,7 +69,11 @@ const tileWidth = PixelRatio.roundToNearestPixel(226)
 const tileHeight = PixelRatio.roundToNearestPixel((226 * 379) / 550)
 
 function Chalkboard() {
-  const { width, height } = useWindowDimensions()
+  const screen = useWindowDimensions()
+  // The window size can come back short on Android (edge-to-edge), so the board measures itself too.
+  const [box, setBox] = useState({ width: 0, height: 0 })
+  const width = Math.max(screen.width, box.width)
+  const height = Math.max(screen.height, box.height)
   const columns = Math.ceil(width / tileWidth)
   const rows = Math.ceil(height / tileHeight) + 1
   const tiles = []
@@ -80,7 +90,14 @@ function Chalkboard() {
     }
   }
   return (
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.board]}>
+    <View
+      pointerEvents="none"
+      style={[StyleSheet.absoluteFill, styles.board]}
+      onLayout={(event) => {
+        const { width: w, height: h } = event.nativeEvent.layout
+        setBox((old) => (old.width === w && old.height === h ? old : { width: w, height: h }))
+      }}
+    >
       {tiles}
       <View style={[StyleSheet.absoluteFill, styles.veil]} />
     </View>

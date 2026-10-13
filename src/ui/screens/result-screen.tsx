@@ -37,7 +37,10 @@ export function ResultScreen() {
           {interview.records.map((record, index) => (
             <li key={record.question.id}>
               <p className="eyebrow">
-                {index + 1}. {verdictLabel[record.grade.verdict]}
+                {index + 1}.
+                <span className={`verdict-badge is-${record.grade.verdict}`}>
+                  {verdictLabel[record.grade.verdict]}
+                </span>
               </p>
               <h2>{record.question.prompt}</h2>
               <p>

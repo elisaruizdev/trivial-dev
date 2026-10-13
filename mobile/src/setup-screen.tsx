@@ -3,22 +3,30 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { levelBrief, levels, type Level } from '../../src/domain/level.ts'
 import { topics } from '../../src/domain/topic.ts'
 import { useInterview } from '../../src/ui/use-interview.ts'
-import { apiOrigin } from './api-origin.ts'
+import { StatsPanel } from './stats-panel.tsx'
 import { Credit } from './credit.tsx'
-import { useThreeColumnWidth } from './grid-columns.ts'
+import { useColumnWidth } from './grid-columns.ts'
 import { useScreenSpace } from './screen-space.ts'
 import { colors } from './theme.ts'
 
-export function SetupScreen({ onOpenLibrary, onOpenCode }: { onOpenLibrary: () => void; onOpenCode: () => void }) {
+export function SetupScreen({
+  onOpenLibrary,
+  onOpenCode,
+  onOpenAbout,
+}: {
+  onOpenLibrary: () => void
+  onOpenCode: () => void
+  onOpenAbout: () => void
+}) {
   const { state, start } = useInterview()
   const [topicId, setTopicId] = useState<string | null>(null)
   const [level, setLevel] = useState<Level | null>(null)
   const ready = topicId !== null && level !== null
   const loading = state.status === 'loading'
   const error = state.status === 'error' ? state.message : null
-  const origin = apiOrigin()
   const space = useScreenSpace()
-  const colWidth = useThreeColumnWidth()
+  const topicWidth = useColumnWidth(2)
+  const levelWidth = useColumnWidth(3)
 
   async function onStart() {
     const topic = topics.find((item) => item.id === topicId)
@@ -28,20 +36,19 @@ export function SetupScreen({ onOpenLibrary, onOpenCode }: { onOpenLibrary: () =
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={[styles.content, space]}>
-      <Text style={styles.eyebrow}>Prepara tu entrevista técnica</Text>
-      <Text style={styles.lead}>
-        Elige tema y nivel. La ronda son 30 preguntas. Si el ordenador está en la misma Wi-Fi y corre el servidor, las
-        genera la IA. Si guardas preguntas tuyas, entran cuando coinciden el tema y el nivel.
-      </Text>
-      {!ready ? <Text style={styles.hint}>Elige un tema y un nivel.</Text> : null}
-      <Text style={styles.note}>
-        {origin
-          ? `Servidor de preguntas: ${origin}`
-          : 'Sin la IP del ordenador, esta ronda usa el banco de ejemplo.'}
-      </Text>
-      <Text style={styles.note}>
-        Si aceptas los avisos, te recuerdo practicar y las preguntas que falles, aunque cierres la app.
-      </Text>
+      <View style={styles.top}>
+        <Text style={styles.eyebrow}>Prepara tu entrevista técnica</Text>
+        <Pressable
+          style={styles.info}
+          onPress={onOpenAbout}
+          accessibilityRole="button"
+          accessibilityLabel="Sobre esta app"
+          hitSlop={10}
+        >
+          <Text style={styles.infoText}>i</Text>
+        </Pressable>
+      </View>
+      <StatsPanel />
       <Text style={styles.legend}>Tema</Text>
       <View style={styles.grid}>
         {topics.map((topic) => {
@@ -49,7 +56,7 @@ export function SetupScreen({ onOpenLibrary, onOpenCode }: { onOpenLibrary: () =
           return (
             <Pressable
               key={topic.id}
-              style={[styles.card, { width: colWidth }, selected ? styles.cardOn : null]}
+              style={[styles.card, { width: topicWidth }, selected ? styles.cardOn : null]}
               onPress={() => setTopicId(topic.id)}
             >
               <Text style={styles.cardTitle}>{topic.label}</Text>
@@ -67,7 +74,7 @@ export function SetupScreen({ onOpenLibrary, onOpenCode }: { onOpenLibrary: () =
           return (
             <Pressable
               key={item}
-              style={[styles.card, { width: colWidth }, selected ? styles.cardOn : null]}
+              style={[styles.card, { width: levelWidth }, selected ? styles.cardOn : null]}
               onPress={() => setLevel(item)}
             >
               <Text style={styles.cardTitle}>{levelBrief[item].label}</Text>
@@ -96,10 +103,19 @@ export function SetupScreen({ onOpenLibrary, onOpenCode }: { onOpenLibrary: () =
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: 'transparent' },
-  content: { paddingHorizontal: 24, gap: 10 },
-  eyebrow: { color: colors.yellow, letterSpacing: 2, fontSize: 15, fontWeight: '700', textTransform: 'uppercase' },
-  lead: { color: colors.paper, fontSize: 20, lineHeight: 29 },
-  hint: { color: colors.paper, fontSize: 20, lineHeight: 29 },
+  content: { flexGrow: 1, paddingHorizontal: 24, gap: 10 },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  info: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.yellow,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoText: { color: colors.yellow, fontWeight: '700', fontSize: 17, fontStyle: 'italic' },
+  eyebrow: { flexShrink: 1, color: colors.yellow, letterSpacing: 2, fontSize: 15, fontWeight: '700', textTransform: 'uppercase' },
   note: { color: colors.textSoft, fontSize: 15, lineHeight: 22 },
   legend: { marginTop: 12, color: colors.paper, letterSpacing: 2, fontSize: 16, fontWeight: '700', textTransform: 'uppercase' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
